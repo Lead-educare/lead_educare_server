@@ -1,0 +1,36 @@
+{
+  "name": "hello_talk_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-code-wizards/hello_talk_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/the-code-wizards/hello_talk_server/issues"
+  },
+  "homepage": "https://github.com/the-code-wizards/hello_talk_server#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "concurrently": "^7.6.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "formidable": "^2.1.1",
+    "jsonwebtoken": "^9.0.0",
+    "mongodb": "^4.13.0",
+    "nodemailer": "^6.9.1",
+    "nodemailer-mailgun-transport": "^2.1.5",
+    "stripe": "^11.7.0",
+    "validator": "^13.7.0"
+  }
+}
