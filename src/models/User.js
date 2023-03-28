@@ -11,6 +11,13 @@ const userSchema = mongoose.Schema({
         required: [true, "Email address is required"],
         unique: true
     },
+    mobile: {
+      type: String,
+      trim: true,
+      required: [true, 'mobile number is required'],
+      validate: [validator.isMobilePhone, 'Provide a valid mobile number'],
+      unique: true
+    },
     firstName: {
         type: String,
         required: [true, 'First name is required'],
@@ -53,6 +60,10 @@ const userSchema = mongoose.Schema({
             message: 'Password does not match'
         }
     },
+    role: {
+      type: String,
+      enum: ['SUPERADMIN','ADMIN','TEACHER','STUDENT']
+    },
     status: {
         type: String,
         enum: ['active', 'inactive', 'blocked'],
@@ -62,10 +73,6 @@ const userSchema = mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
-    },
-    avatar: {
-        type: String,
-        default: ''
     }
 
 }, {versionKey: false, timestamps: true});

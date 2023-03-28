@@ -13,7 +13,7 @@ const courseContentSchema = new Schema({
         type: URL,
         trim: true
     }
-});
+}, {versionKey: false, timestamps: true});
 
 const CourseContent = model('CourseContent', courseContentSchema);
 

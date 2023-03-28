@@ -35,6 +35,6 @@
     "nodemon": "^2.0.22",
     "slugify": "^1.6.6",
     "stripe": "^11.7.0",
-    "validator": "^13.7.0"
+    "validator": "^13.9.0"
   }
 }

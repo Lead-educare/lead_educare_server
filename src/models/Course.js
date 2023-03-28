@@ -17,6 +17,9 @@ const courseSchema = new Schema({
         trim: true,
         lowercase: true,
     },
+    description: {
+      type: String
+    },
     regularPrice: {
         type: Number,
         required: [true, 'price is required'],
@@ -40,7 +43,7 @@ const courseSchema = new Schema({
         type: String
     }
 
-});
+}, {versionKey: false, timestamps: true});
 
 courseSchema.pre('save', function (next) {
     this.slug = slugify(this.name);
