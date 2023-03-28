@@ -21,7 +21,7 @@ const courseModuleSchema = new Schema({
     moduleNo: {
         type: Number
     }
-});
+}, {versionKey: false, timestamps: true});
 
 const CourseModule = model('CourseModule', courseModuleSchema);
 

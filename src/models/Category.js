@@ -15,7 +15,7 @@ const categorySchema = new Schema({
         lowercase: true
     }
 
-});
+}, {versionKey: false, timestamps: true});
 
 categorySchema.pre('save', function (next) {
     this.slug = slugify(this.name);
