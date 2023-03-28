@@ -1,6 +1,8 @@
-exports.getUserProfile = async (req, res)=>{
+const userService = require('../services/userService');
+
+exports.getUserProfile = async (req, res, next)=>{
     try {
-        const user = await getUserByEmailService(req.auth?.email);
+        const user = await userService.findUserByProperty('email', req.auth?.email);
 
         if (!user){
             return res.status(401).json({
@@ -12,34 +14,31 @@ exports.getUserProfile = async (req, res)=>{
         delete user.password;
 
         res.status(200).json({
-            status: 'success',
             user
         })
 
-    }catch (error) {
-        console.log(error)
-        res.status(401).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        })
+    }catch (e) {
+        console.log(e)
+        next(e)
     }
 };
 
-exports.patchUser = async (req, res)=>{
+exports.patchUser = async (req, res, next)=>{
     try {
 
         const {firstName, lastName} = req.body;
+        const isUpdate = await userService.userProfileUpdateService(req.auth?._id, firstName, lastName);
 
-        const result = await userProfileUpdateService(req.auth?._id, firstName, lastName);
-
+        if (isUpdate.modifiedCount === 0){
+            return res.status(200).json({
+                message: 'profile not update'
+            })
+        }
         res.status(200).json({
-            result
+            message: 'profile update successfully'
         })
-    }catch (error) {
-        console.log(error)
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        });
+    }catch (e) {
+        console.log(e)
+        next(e)
     }
 }

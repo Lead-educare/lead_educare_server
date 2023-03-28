@@ -11,15 +11,16 @@ const registerService = async (
     const isMatch = await userService.findUserByProperty('email', email);
     if (isMatch) throw error('Email already taken', 400);
 
-    const isOtp = await otpService.findOptByEmail(email);
-    let otp;
+    const isOtp = await otpService.findOptProperty({email: email});
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
     if (isOtp) {
-        otp = await otpService.updateOtp(email)
+        await otpService.updateOtp({email, otp, status: 0})
     } else {
-        otp = await otpService.createOtp(email);
+        await otpService.createOtp({email, otp});
     }
     // Email Send
-    const send = await sendOTP(email, "Your Verification Code is= " + otp?.otp, `${process.env.APP_NAME} email verification`)
+    const send = await sendOTP(email, "Your Verification Code is= " + otp, `${process.env.APP_NAME} email verification`)
 
     if (send[0].statusCode === 202) {
         return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword});
@@ -80,13 +81,10 @@ const resendOtpService = async (email) => {
 
 const verifyOtpService = async (email, otp, options) => {
 
-    let status = 0;
-    let statusUpdate = 1;
-
-    const isOtp = otpService.findOptProperty({email, otp, status: status}, null, options)
+    const isOtp = otpService.findOptProperty({email, otp, status: 0}, null, options)
     if (!isOtp) throw error('Invalid OTP', 400);
 
-    isOtp.status = statusUpdate;
+    isOtp.status = 1;
     await isOtp.save(options);
 
     // const user = await UserModel.findOne({email}, {verified: 1, _id: 1}, options);
@@ -96,7 +94,7 @@ const verifyOtpService = async (email, otp, options) => {
 
 }
 
-const passwordChangeService = async ({email, oldPassword, password, confirmPassword})=>{
+const passwordChangeService = async ({email, oldPassword, password, confirmPassword}) => {
 
     const user = await userService.findUserByProperty('email', email);
 
@@ -112,12 +110,36 @@ const passwordChangeService = async ({email, oldPassword, password, confirmPassw
 
     const hash = authHelper.hashPassword(password);
 
-    return userService.passwordUpdateService(email, hash);
+    return userService.passwordUpdateService({email, hash});
+}
+
+
+const resetPasswordService = async ({email, otp, password, confirmPassword, options}) => {
+
+    const isOtp = otpService.findOptProperty({email, otp, status: 1})
+
+    if (!isOtp) throw error('Invalid request', 400);
+
+    // const user = await getUserByEmailService(email);
+    const isUser = userService.findUserByProperty('email', email);
+
+    if (!isUser) throw error('Invalid request', 400);
+
+    if (FormHelper.isEmpty(password)) throw error('password is required', 400);
+    if (FormHelper.isEmpty(confirmPassword)) throw error('confirm password is required', 400);
+    if (!FormHelper.isPasswordValid(password)) throw error('Password must contain at least 8 characters long, one uppercase letter, one lowercase letter, one digit and one special character', 400);
+    if (!FormHelper.comparePassword(password, confirmPassword)) throw error("Password doesn't match", 400);
+
+    const hash = authHelper.hashPassword(password);
+
+    await userService.passwordUpdateService({email, hash, options});
+
+    return otpService.updateOtp({email, otp, status: 1, options});
 }
 
 
 module.exports = {
-    registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService
+    registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
 }
 
 

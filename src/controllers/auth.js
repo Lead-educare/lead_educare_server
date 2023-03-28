@@ -130,85 +130,33 @@ exports.passwordChange = async (req, res) => {
     }
 }
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
 
-    let email = req.params.email;
-    let OTPCode = req.params.otp;
+    let {email, otp} = req.params;
     let {password, confirmPassword} = req.body;
-    let statusUpdate = 1;
+    const session = await mongoose.startSession();
+    await session.startTransaction();
 
     try {
-        const otp = await OtpModel.aggregate([
-            {$match: {email: email, otp: OTPCode, status: statusUpdate}}
-        ])
+        const options = { session };
+        const isUpdate = await authService.resetPasswordService({email, otp, password, confirmPassword, options});
 
-        if (otp[0]?.status !== 1) {
-            return res.status(400).json({
-                status: 'fail',
-                error: 'Invalid request'
+        await session.commitTransaction();
+        session.endSession();
+
+        if (isUpdate.modifiedCount === 0){
+            return res.status(200).json({
+                message: 'Password not reset'
             })
         }
 
-        const user = await getUserByEmailService(email);
-
-        if (!user) {
-            return res.status(400).json({
-                status: 'fail',
-                error: 'Invalid request'
-            });
-        }
-
-        if (password === '') {
-            return res.status(400).json({
-                status: 'fail',
-                error: "password is required"
-            });
-        }
-        if (confirmPassword === '') {
-            return res.status(400).json({
-                status: 'fail',
-                error: "confirmPassword is required"
-            });
-        }
-
-        const validate = validator.isStrongPassword(password, {
-            minLength: 8,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 1,
-            minLowercase: 1
-        })
-
-        if (!validate) {
-            return res.status(400).json({
-                status: 'fail',
-                error: "Password is not strong, please provide a strong password"
-            });
-        }
-
-        if (password !== confirmPassword) {
-            return res.status(400).json({
-                status: 'fail',
-                error: "Password doesn't match"
-            });
-        }
-
-        const hash = hashPassword(password);
-
-        const result = await passwordUpdateService(email, hash);
-
-        await OtpModel.updateOne({email: email, otp: OTPCode, status: 1}, {
-            otp: '',
-        })
-
         res.status(200).json({
-            result
+            message: 'Password reset successfully'
         })
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        });
+    } catch (e) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log(e)
+        next(e)
     }
 }
