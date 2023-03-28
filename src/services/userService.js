@@ -11,6 +11,12 @@ exports.findUserByProperty = (key, value) => {
     return User.findOne({ [key]: value });
 };
 
+exports.createNewUser = (
+    {email, mobile, firstName, lastName, password, confirmPassword}
+)=>{
+    const user = new User({email, mobile, firstName, lastName, password, confirmPassword});
+    return user.save();
+}
 
 
 exports.getUserByEmailService = async (email)=>{

@@ -1,43 +1,28 @@
-const User = require("../models/User");
-const {findUserByProperty} = require("./userService");
+const userService = require("./userService");
+const error = require('../helpers/error');
+const otpService = require("./otpService");
+const sendOTP = require('../helpers/sendOTP');
 
 exports.registerService = async(
     { email, mobile, firstName, lastName, password, confirmPassword}
 )=>{
-    const isMatch = await findUserByProperty('email', email);
-    if (isMatch){
-        return res.status(400).json({
-            status: 'fail',
-            error: 'Email already taken'
-        })
-    }
+    const isMatch = await userService.findUserByProperty('email', email);
+    if (isMatch) throw error('Email already taken', 400);
 
-
-    const OtpCode = Math.floor(100000 + Math.random() * 900000);
-
-    const isExitEmail = await OtpModel.findOne({email})
-
-    if (isExitEmail){
-        await OtpModel.updateOne({email}, {$set: {otp: OtpCode, status: 0}});
+    const isOtp= await otpService.findOptByEmail(email);
+    let otp;
+    if (isOtp){
+       otp = await otpService.updateOtp(email)
     }else {
-        await OtpModel.create({email, otp: OtpCode})
+       otp = await otpService.createOtp(email);
     }
     // Email Send
-    const SendEmail = await sendEmail(email,"Your Verification Code is= "+ OtpCode,"Blog site email verification")
+    const send = await sendOTP(email,"Your Verification Code is= "+ otp?.otp, `${process.env.APP_NAME} email verification`)
 
-    if (SendEmail[0].statusCode === 202){
-        const user = await registerService(req.body);
-        await user.save({ validateBeforeSave: false });
-
-        res.status(200).json({
-            status: 'success',
-            message: 'OTP send successfully, please check your email',
-        })
+    if (send[0].statusCode === 202){
+       return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword});
     }else {
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        })
+        throw error('Server error occurred', 5000)
     }
 
 };

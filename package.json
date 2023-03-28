@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/the-code-wizards/hello_talk_server#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.1",
     "concurrently": "^7.6.0",

@@ -1,18 +1,17 @@
 const {registerService} = require("../services/authService");
 
-exports.register = async (req, res)=>{
+exports.register = async (req, res, next)=>{
     try{
         const {email, mobile, firstName, lastName, password, confirmPassword} = req.body;
 
-        const result = await registerService({email, mobile, firstName, lastName, password, confirmPassword});
+        await registerService({email, mobile, firstName, lastName, password, confirmPassword});
 
+        res.status(201).json({
+            message: 'OTP Send success in your email'
+        });
 
-    }catch(error){
-        console.log(error)
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        })
+    }catch(e){
+        next(e)
     }
 };
 
