@@ -4,14 +4,14 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 
-exports.findUserByProperty = (key, value) => {
+const findUserByProperty = (key, value) => {
     if (key === '_id') {
         return User.findById(value);
     }
     return User.findOne({ [key]: value });
 };
 
-exports.createNewUser = (
+const createNewUser = (
     {email, mobile, firstName, lastName, password, confirmPassword}
 )=>{
     const user = new User({email, mobile, firstName, lastName, password, confirmPassword});
@@ -19,30 +19,31 @@ exports.createNewUser = (
 }
 
 
-exports.getUserByEmailService = async (email)=>{
+const getUserByEmailService = async (email)=>{
     const user = await User.aggregate(  [
         {$match: {email } }
     ] );
     return user[0]
 };
 
-
-
-exports.passwordUpdateService = async (email, hashPassword)=>{
-    const result = await User.updateOne(
+const passwordUpdateService = async (email, hash)=>{
+    return User.updateOne(
         {email: email},
         {$set: {
-                password: hashPassword
+                password: hash
             }}
     );
-    return result;
 }
 
-exports.userProfileUpdateService = async (_id, firstName, lastName)=>{
+const userProfileUpdateService = async (_id, firstName, lastName)=>{
     const result = await User.updateOne({_id: ObjectId(_id)}, {$set: {
             firstName,
             lastName,
         }}, {runValidators: true});
 
     return result;
+}
+
+module.exports = {
+    findUserByProperty, createNewUser, getUserByEmailService, passwordUpdateService, userProfileUpdateService
 }

@@ -24,4 +24,4 @@ class FormHelper {
 
 }
 
-module.exports = FormHelper;
+module.exports = new FormHelper();
