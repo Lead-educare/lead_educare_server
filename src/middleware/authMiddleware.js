@@ -10,6 +10,7 @@ const authVerifyMiddleware = async (req, res, next)=>{
 
         token = token.split(' ')[1];
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+
         const user = await userService.findUserByProperty('_id', decoded._id)
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
@@ -24,7 +25,6 @@ const authVerifyMiddleware = async (req, res, next)=>{
 
 function checkPermissions(...permissions) {
     return async function (req, res, next) {
-        console.log(permissions)
         const userId = req.auth._id;
         const user = await User.findById(userId).populate('roles');
         if (user?.roles[0]['name'] === 'SUPERADMIN'){
@@ -33,6 +33,9 @@ function checkPermissions(...permissions) {
         const userPermissions = user?.roles.reduce((permissions, role) => {
             return permissions.concat(role.permissions);
         }, []);
+
+        console.log(userPermissions)
+
         const authorized = permissions.every((permission) =>
             userPermissions.some(
                 (userPermission) => userPermission.name === permission
@@ -41,7 +44,7 @@ function checkPermissions(...permissions) {
         if (!authorized) {
             return res.status(403).json({ message: 'Forbidden' });
         }
-        next();
+        // next();
     };
 }
 

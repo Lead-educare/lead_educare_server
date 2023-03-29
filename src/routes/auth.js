@@ -5,9 +5,14 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.get('/auth-check', authMiddleware.authVerifyMiddleware, (req, res)=>{
     res.status(200).json({ok: true});
 });
-router.get('/superadmin-check', authMiddleware.authVerifyMiddleware, authMiddleware.isSuperAdmin, authMiddleware.checkPermissions('delete_user'), (req, res)=>{
+router.get('/superadmin-check', authMiddleware.authVerifyMiddleware, authMiddleware.isSuperAdmin, (req, res)=>{
     res.status(200).json({ok: true});
 });
+
+router.get('/permission-check', authMiddleware.authVerifyMiddleware, authMiddleware.checkPermissions('create_user'), (req, res)=>{
+    res.status(200).json({ok: true});
+});
+
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
@@ -18,5 +23,4 @@ router.patch('/password', authMiddleware.authVerifyMiddleware , authController.p
 
 // Role Permission Route
 router.post('/permissions', authMiddleware.authVerifyMiddleware, authMiddleware.isSuperAdmin, authController.createPermission);
-
 module.exports = router;
