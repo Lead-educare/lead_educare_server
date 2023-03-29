@@ -101,6 +101,7 @@ const sendOtpService = async (email) => {
 const verifyOtpService = async (email, otp, options) => {
 
     const isOtp = await otpService.findOptByProperty({email, otp, status: 0}, null, options);
+
     if (!isOtp) throw error('Invalid OTP', 400);
 
     isOtp.status = 1;
@@ -117,7 +118,6 @@ const verifyOtpService = async (email, otp, options) => {
 }
 const passwordChangeService = async ({email, oldPassword, password, confirmPassword})=>{
 
-
     const user = await userService.findUserByProperty('email', email);
 
     const userHashPassword = user ? user.password : '';
@@ -127,7 +127,6 @@ const passwordChangeService = async ({email, oldPassword, password, confirmPassw
     if (!isMatch) throw error("Old password doesn't match", 400);
 
     const hash = authHelper.hashPassword(password);
-
 
     return userService.passwordUpdateService({email, hash});
 }

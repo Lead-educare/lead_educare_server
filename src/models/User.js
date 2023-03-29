@@ -65,6 +65,13 @@ const userSchema = new Schema({
         }
     },
 
+
+    role: {
+      type: String,
+      enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
+      default: 'USER'
+    },
+
     // role: {
     //   type: String,
     //   enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
