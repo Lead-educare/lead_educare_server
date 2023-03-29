@@ -113,9 +113,7 @@ const verifyOtpService = async (email, otp, options) => {
 
     const isOtp = await otpService.findOptByProperty({email, otp, status: 0}, null, options)
 
-
     const isOtp = otpService.findOptProperty({email, otp, status: 0}, null, options)
-
     if (!isOtp) throw error('Invalid OTP', 400);
 
     isOtp.status = 1;
@@ -139,7 +137,6 @@ const verifyOtpService = async (email, otp, options) => {
 const passwordChangeService = async ({email, oldPassword, password}) => {
 
 const passwordChangeService = async ({email, oldPassword, password, confirmPassword})=>{
-
 
     const user = await userService.findUserByProperty('email', email);
 
@@ -179,11 +176,13 @@ const resetPasswordService = async ({email, otp, password, options}) => {
 
 
 module.exports = {
-    registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService, createNewRoleService, createNewPermissionService
 
+    registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
+    registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService, createNewRoleService, createNewPermissionService
     registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
     registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
     registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService
+
 }
 
 
