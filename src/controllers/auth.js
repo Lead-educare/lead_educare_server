@@ -62,6 +62,7 @@ exports.register = async (req, res, next) => {
 
         await authService.registerService({email, mobile, firstName, lastName, password, confirmPassword});
 
+
         res.status(201).json({
             message: 'OTP Send success in your email'
         });
@@ -250,6 +251,109 @@ exports.resetPassword = async (req, res, next) => {
         await session.abortTransaction();
         session.endSession();
         console.log(e)
+        next(e)
+exports.resetPassword = async (req, res) => {
+
+    let email = req.params.email;
+    let OTPCode = req.params.otp;
+    let {password, confirmPassword} = req.body;
+    let statusUpdate = 1;
+
+    try {
+        const otp = await OtpModel.aggregate([
+            {$match: {email: email, otp: OTPCode, status: statusUpdate}}
+        ])
+
+        if (otp[0]?.status !== 1) {
+            return res.status(400).json({
+                status: 'fail',
+                error: 'Invalid request'
+            })
+        }
+
+        const user = await getUserByEmailService(email);
+
+        if (!user) {
+            return res.status(400).json({
+                status: 'fail',
+                error: 'Invalid request'
+            });
+        }
+
+        if (password === '') {
+            return res.status(400).json({
+                status: 'fail',
+                error: "password is required"
+            });
+        }
+        if (confirmPassword === '') {
+            return res.status(400).json({
+                status: 'fail',
+                error: "confirmPassword is required"
+            });
+        }
+
+        const validate = validator.isStrongPassword(password, {
+            minLength: 8,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+            minLowercase: 1
+        })
+
+        if (!validate) {
+            return res.status(400).json({
+                status: 'fail',
+                error: "Password is not strong, please provide a strong password"
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                status: 'fail',
+                error: "Password doesn't match"
+            });
+        }
+
+        const hash = hashPassword(password);
+
+        const result = await passwordUpdateService(email, hash);
+
+        await OtpModel.updateOne({email: email, otp: OTPCode, status: 1}, {
+            otp: '',
+        })
+
+        res.status(200).json({
+            result
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            status: 'fail',
+            error: 'Server error occurred'
+        });
+    }
+}
+
+// Role and permission controller
+
+exports.createRole = async ()=>{
+
+}
+exports.createPermission = async (req, res, next)=>{
+    const {permission, roleId} = req.body;
+    const session = await mongoose.startSession();
+    await session.startTransaction();
+    try {
+        const options = { session };
+        const result = await authService.createNewPermissionService({permissionName: permission, roleId, options});
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json(result);
+    }catch (e) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Transaction aborted:', e);
         next(e)
     }
 }
