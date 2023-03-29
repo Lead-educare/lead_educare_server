@@ -22,6 +22,17 @@ const registerService = async (
     // Email Send
     const send = await sendOTP(email, "Your Verification Code is= " + otp, `${process.env.APP_NAME} email verification`)
 
+    const isOtp = await otpService.findOptByEmail(email);
+    let otp;
+    if (isOtp) {
+        otp = await otpService.updateOtp(email)
+    } else {
+        otp = await otpService.createOtp(email);
+    }
+    // Email Send
+    const send = await sendOTP(email, "Your Verification Code is= " + otp?.otp, `${process.env.APP_NAME} email verification`)
+
+
     if (send[0].statusCode === 202) {
         return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword});
     } else {
@@ -81,10 +92,20 @@ const resendOtpService = async (email) => {
 
 const verifyOtpService = async (email, otp, options) => {
 
+
     const isOtp = otpService.findOptProperty({email, otp, status: 0}, null, options)
     if (!isOtp) throw error('Invalid OTP', 400);
 
     isOtp.status = 1;
+
+    let status = 0;
+    let statusUpdate = 1;
+
+    const isOtp = otpService.findOptProperty({email, otp, status: status}, null, options)
+    if (!isOtp) throw error('Invalid OTP', 400);
+
+    isOtp.status = statusUpdate;
+
     await isOtp.save(options);
 
     // const user = await UserModel.findOne({email}, {verified: 1, _id: 1}, options);
@@ -95,6 +116,9 @@ const verifyOtpService = async (email, otp, options) => {
 }
 
 const passwordChangeService = async ({email, oldPassword, password, confirmPassword}) => {
+
+const passwordChangeService = async ({email, oldPassword, password, confirmPassword})=>{
+
 
     const user = await userService.findUserByProperty('email', email);
 
@@ -109,6 +133,7 @@ const passwordChangeService = async ({email, oldPassword, password, confirmPassw
     if (!FormHelper.comparePassword(password, confirmPassword)) throw error("Password doesn't match", 400);
 
     const hash = authHelper.hashPassword(password);
+
 
     return userService.passwordUpdateService({email, hash});
 }
@@ -135,11 +160,15 @@ const resetPasswordService = async ({email, otp, password, confirmPassword, opti
     await userService.passwordUpdateService({email, hash, options});
 
     return otpService.updateOtp({email, otp, status: 1, options});
+
+    return userService.passwordUpdateService(email, hash);
+
 }
 
 
 module.exports = {
     registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
+    registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService
 }
 
 
