@@ -62,6 +62,7 @@ exports.register = async (req, res, next) => {
 
         await authService.registerService({email, mobile, firstName, lastName, password, confirmPassword});
 
+
         res.status(201).json({
             message: 'OTP Send success in your email'
         });
@@ -250,6 +251,29 @@ exports.resetPassword = async (req, res, next) => {
         await session.abortTransaction();
         session.endSession();
         console.log(e)
+        next(e)
+    }
+}
+
+// Role and permission controller
+
+exports.createRole = async ()=>{
+
+}
+exports.createPermission = async (req, res, next)=>{
+    const {permission, roleId} = req.body;
+    const session = await mongoose.startSession();
+    await session.startTransaction();
+    try {
+        const options = { session };
+        const result = await authService.createNewPermissionService({permissionName: permission, roleId, options});
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json(result);
+    }catch (e) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Transaction aborted:', e);
         next(e)
     }
 }

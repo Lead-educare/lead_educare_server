@@ -1,8 +1,11 @@
-const mongoose = require('mongoose');
+const {Schema, model} = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const userSchema = mongoose.Schema({
+
+
+
+const userSchema = new Schema({
     email: {
         type: String,
         validate: [validator.isEmail, "Provide a valid Email"],
@@ -61,11 +64,12 @@ const userSchema = mongoose.Schema({
             message: 'Password does not match'
         }
     },
-    role: {
-      type: String,
-      enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
-      default: 'USER'
-    },
+    // role: {
+    //   type: String,
+    //   enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
+    //   default: 'USER'
+    // },
+    roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
     status: {
         type: String,
         enum: ['active', 'inactive', 'blocked'],
@@ -78,6 +82,8 @@ const userSchema = mongoose.Schema({
     }
 
 }, {versionKey: false, timestamps: true});
+
+
 
 userSchema.pre('save', function(next){
     if(!this.isModified('password')){
@@ -100,7 +106,7 @@ userSchema.methods.hashPassword = function(password){
 }
 
 
-const User = mongoose.model('User', userSchema);
+const User = model('User', userSchema);
 
 module.exports = User;
 

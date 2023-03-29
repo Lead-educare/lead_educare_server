@@ -16,9 +16,9 @@ const findUserByProperty = (key, value, projection = null) => {
 };
 
 const createNewUser = (
-    {email, mobile, firstName, lastName, password, confirmPassword}
+    {email, mobile, firstName, lastName, password, confirmPassword, roles}
 )=>{
-    const user = new User({email, mobile, firstName, lastName, password, confirmPassword});
+    const user = new User({email, mobile, firstName, lastName, password, confirmPassword, roles});
     return user.save();
 }
 const passwordUpdateService = async ({email, hash, options = null})=>{
