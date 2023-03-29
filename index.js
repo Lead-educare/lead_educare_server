@@ -53,7 +53,7 @@ function notifyBlog(blog) {
           <div>
               <a href="https://hello-talk-client.vercel.app/blogs" target="_blank"> <button style="background-color: #61B800; color: white; padding: 13px 35px; border: 0; outline: none; border-radius: 14px; font-size: 18px; text-transform: uppercase;">See blogs</button> </a>
           </div>
-        </div>
+        </div>PP
         <h3 style="color: #333; margin-top: 20px; margin-botom: 5px; text-align: center;">Thanks from (Hello Talk)</h3>
         <p>visit now: <a style="color: #61B800" href="https://hello-talk-client.vercel.app/blogs">https://hello-talk-client.vercel.app/blogs</a> </>
       </div>
@@ -236,7 +236,7 @@ async function run() {
                 price1,
                 offer_price1,
                 module_links1,
-            } = coursedata;
+            } = coursedata ;
 
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
