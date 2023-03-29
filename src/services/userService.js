@@ -40,5 +40,5 @@ const userProfileUpdateService = async (_id, firstName, lastName)=>{
 }
 
 module.exports = {
-    findUserByProperty, createNewUser, getUserByEmailService, passwordUpdateService, userProfileUpdateService
+    findUserByProperty, createNewUser, passwordUpdateService, userProfileUpdateService
 }
