@@ -2,9 +2,15 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-const findUserByProperty = (key, value) => {
+const findUserByProperty = (key, value, projection = null) => {
     if (key === '_id') {
+        if (projection !== null){
+            return User.findById(value, projection);
+        }
         return User.findById(value);
+    }
+    if (projection !== null){
+        return User.findOne({ [key]: value }, projection);
     }
     return User.findOne({ [key]: value });
 };

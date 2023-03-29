@@ -2,7 +2,7 @@ const OtpModel = require("../models/Otp");
 
 
 
-const findOptProperty = (propertyObj)=>{
+const findOptByProperty = (propertyObj)=>{
    return OtpModel.findOne(propertyObj)
 }
 
@@ -18,5 +18,5 @@ const createOtp = ({email, otp})=>{
 }
 
 module.exports = {
-    findOptProperty, updateOtp, createOtp
+    findOptByProperty, updateOtp, createOtp
 }
