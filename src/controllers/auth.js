@@ -6,6 +6,60 @@ exports.register = async (req, res, next) => {
     try {
         const {email, mobile, firstName, lastName, password, confirmPassword} = req.body;
 
+
+        if (FormHelper.isEmpty(email)){
+            return res.status(400).json({
+                error: 'Email is required'
+            })
+        }
+        if (!FormHelper.isEmail(email)){
+            return res.status(400).json({
+                error: 'Provide a valid email address'
+            })
+        }
+        if (FormHelper.isEmpty(firstName)){
+            return res.status(400).json({
+                error: 'First Name is required'
+            })
+        }
+        if (FormHelper.isEmpty(lastName)){
+            return res.status(400).json({
+                error: 'Last Name is required'
+            })
+        }
+        if (FormHelper.isEmpty(mobile)){
+            return res.status(400).json({
+                error: 'Mobile number is required'
+            })
+        }
+        if (!FormHelper.isMobile(mobile)){
+            return res.status(400).json({
+                error: 'Provide a valid mobile number'
+            })
+        }
+
+        if (FormHelper.isEmpty(password)){
+            return res.status(400).json({
+                error: 'Password is required'
+            })
+        }
+        if (!FormHelper.isPasswordValid(password)){
+            return res.status(400).json({
+                error: 'Password must contain at least 8 characters long, one uppercase letter, one lowercase letter, one digit and one special character'
+            })
+        }
+        if (FormHelper.isEmpty(confirmPassword)){
+            return res.status(400).json({
+                error: 'Confirm password is required'
+            })
+        }
+        if (!FormHelper.comparePassword(password, confirmPassword)){
+            return res.status(400).json({
+                error: "Password doesn't match"
+            })
+        }
+
+
         await authService.registerService({email, mobile, firstName, lastName, password, confirmPassword});
 
         res.status(201).json({
@@ -29,10 +83,10 @@ exports.login = async (req, res, next) => {
     }
 };
 
-exports.resendOtp = async (req, res, next) => {
+exports.sendOtp = async (req, res, next) => {
     try {
         const email = req.params?.email;
-        const otp = await authService.resendOtpService(email);
+        const otp = await authService.sendOtpService(email);
         res.status(200).json({
             message: 'OTP send successfully, please check your email',
             otp
@@ -97,18 +151,37 @@ exports.verifyOTP = async (req, res, next) => {
 }
 
 
-exports.passwordChange = async (req, res) => {
+exports.passwordChange = async (req, res, next) => {
     try {
         const {oldPassword, password, confirmPassword} = req.body;
         const email = req.auth?.email;
 
         if (FormHelper.isEmpty(oldPassword)) {
             return res.status(400).json({
-                status: 'fail',
                 error: "Old password is required"
             });
         }
-        const isUpdate = await authService.passwordChangeService({email,oldPassword, password, confirmPassword});
+        if (FormHelper.isEmpty(password)) {
+            return res.status(400).json({
+                error: "Password is required"
+            });
+        }
+        if (FormHelper.isEmpty(confirmPassword)) {
+            return res.status(400).json({
+                error: "Confirm password is required"
+            });
+        }
+        if (!FormHelper.isPasswordValid(password)){
+            return res.status(400).json({
+                error: "Password must contain at least 8 characters long, one uppercase letter, one lowercase letter, one digit and one special character"
+            });
+        }
+        if (!FormHelper.comparePassword(password, confirmPassword)) {
+            return res.status(400).json({
+                error: "Password doesn't match"
+            });
+        }
+        const isUpdate = await authService.passwordChangeService({email, oldPassword, password});
 
         if (isUpdate.modifiedCount === 0){
             return res.status(200).json({
@@ -121,12 +194,8 @@ exports.passwordChange = async (req, res) => {
         });
 
 
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
-        });
+    } catch (e) {
+        next(e)
     }
 }
 
@@ -139,6 +208,30 @@ exports.resetPassword = async (req, res, next) => {
 
     try {
         const options = { session };
+
+        if (FormHelper.isEmpty(password)) {
+            return res.status(400).json({
+                error: "Password is required"
+            });
+        }
+        if (!FormHelper.isPasswordValid(password)){
+            return res.status(400).json({
+                error: "Password must contain at least 8 characters long, one uppercase letter, one lowercase letter, one digit and one special character"
+            });
+        }
+        if (FormHelper.isEmpty(confirmPassword)) {
+            return res.status(400).json({
+                error: "Confirm password is required"
+            });
+        }
+
+        if (!FormHelper.comparePassword(password, confirmPassword)) {
+            return res.status(400).json({
+                error: "Password doesn't match"
+            });
+        }
+
+
         const isUpdate = await authService.resetPasswordService({email, otp, password, confirmPassword, options});
 
         await session.commitTransaction();

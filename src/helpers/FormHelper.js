@@ -2,10 +2,13 @@ const validator = require('validator');
 
 class FormHelper {
     isEmpty = (value) => {
-        return value === ''
+        return value.trim() === ''
     }
     isEmail = (email) => {
-        return validator.isEmail;
+        return validator.isEmail(email);
+    }
+    isMobile = (mobile)=>{
+        return validator.isMobilePhone(mobile)
     }
 
     isPasswordValid = (password) => {

@@ -10,12 +10,13 @@ const authVerifyMiddleware = async (req, res, next)=>{
         token = token.split(' ')[1];
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
 
-        const user = userService.findUserByProperty('_id', decoded._id)
+
+        const user = await userService.findUserByProperty('_id', decoded._id)
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        req.user = user;
+        req.auth = user;
         next();
     } catch (e) {
         return res.status(400).json({ message: 'Invalid token' });
