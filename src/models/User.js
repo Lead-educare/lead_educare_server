@@ -64,12 +64,20 @@ const userSchema = new Schema({
             message: 'Password does not match'
         }
     },
+
     // role: {
     //   type: String,
     //   enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
     //   default: 'USER'
     // },
     roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+
+    role: {
+      type: String,
+      enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
+      default: 'USER'
+    },
+
     status: {
         type: String,
         enum: ['active', 'inactive', 'blocked'],
