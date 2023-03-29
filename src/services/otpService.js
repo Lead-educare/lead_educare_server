@@ -15,12 +15,6 @@ const updateOtp = ({email, otp, status, options = null})=>{
     return OtpModel.updateOne({email}, {$set: {otp, status: status}}, {new: true});
 }
 
-const createOtp = ({email, otp})=>{
-
-const updateOtp = (email)=>{
-    return OtpModel.updateOne({email}, {$set: {otp, status: 0}}, {new: true});
-}
-
 const createOtp = (email)=>{
 
     return OtpModel.create({email, otp})
