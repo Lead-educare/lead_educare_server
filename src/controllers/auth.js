@@ -130,6 +130,34 @@ exports.passwordChange = async (req, res) => {
     }
 }
 
+exports.resetPassword = async (req, res, next) => {
+
+    let {email, otp} = req.params;
+    let {password, confirmPassword} = req.body;
+    const session = await mongoose.startSession();
+    await session.startTransaction();
+
+    try {
+        const options = { session };
+        const isUpdate = await authService.resetPasswordService({email, otp, password, confirmPassword, options});
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (isUpdate.modifiedCount === 0){
+            return res.status(200).json({
+                message: 'Password not reset'
+            })
+        }
+
+        res.status(200).json({
+            message: 'Password reset successfully'
+        })
+    } catch (e) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log(e)
+        next(e)
 exports.resetPassword = async (req, res) => {
 
     let email = req.params.email;
