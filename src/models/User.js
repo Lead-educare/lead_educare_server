@@ -14,6 +14,7 @@ const userSchema = mongoose.Schema({
     mobile: {
       type: String,
       trim: true,
+      maxLength: 11,
       required: [true, 'mobile number is required'],
       validate: [validator.isMobilePhone, 'Provide a valid mobile number'],
       unique: true
@@ -62,7 +63,8 @@ const userSchema = mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['SUPERADMIN','ADMIN','TEACHER','STUDENT']
+      enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
+      default: 'USER'
     },
     status: {
         type: String,

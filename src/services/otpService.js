@@ -3,7 +3,7 @@ const OtpModel = require("../models/Otp");
 const otp = Math.floor(100000 + Math.random() * 900000);
 
 
-const findOptProperty = (propertyObj)=>{
+const findOptByProperty = (propertyObj)=>{
    return OtpModel.findOne(propertyObj)
 }
 
@@ -27,5 +27,5 @@ const createOtp = (email)=>{
 }
 
 module.exports = {
-    findOptProperty, updateOtp, createOtp
+    findOptByProperty, updateOtp, createOtp
 }
