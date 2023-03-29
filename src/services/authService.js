@@ -4,9 +4,27 @@ const otpService = require("./otpService");
 const sendOTP = require('../helpers/sendOTP');
 const FormHelper = require('../helpers/FormHelper');
 const authHelper = require('../helpers/authHelper');
+const Role = require('../models/Role');
+const Permission = require('../models/Permission');
 
+const createNewRoleService = async ({roleName})=>{
+    const role = new Role({name: roleName});
+    return await role.save();
+}
+const createNewPermissionService = async ({permissionName, roleId, options})=>{
+
+    const role = await Role.findById(roleId);
+    if (!role)throw error('Role not found', 400);
+
+    const permission = new Permission({name: permissionName});
+    await permission.save(options);
+
+    const updateRole = await Role.findByIdAndUpdate(roleId, {$addToSet: {permissions: permission._id}}, {options});
+
+    return {permission, role: updateRole}
+}
 const registerService = async (
-    {email, mobile, firstName, lastName, password, confirmPassword}
+    {email, mobile, firstName, lastName, password, confirmPassword, role = 'USER'}
 ) => {
     const isMatch = await userService.findUserByProperty('email', email);
     if (isMatch) throw error('Email already taken', 400);
@@ -34,7 +52,8 @@ const registerService = async (
 
 
     if (send[0].statusCode === 202) {
-        return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword});
+        const newRole = await createNewRoleService({roleName: role});
+        return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword, roles: newRole?._id});
     } else {
         throw error('Server error occurred', 5000)
     }
@@ -160,10 +179,11 @@ const resetPasswordService = async ({email, otp, password, options}) => {
 
 
 module.exports = {
+    registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService, createNewRoleService, createNewPermissionService
+
     registerService, loginService, sendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
     registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService, resetPasswordService
     registerService, loginService, resendOtpService, verifyOtpService, passwordChangeService
-
 }
 
 
