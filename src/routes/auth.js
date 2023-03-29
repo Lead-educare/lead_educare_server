@@ -23,4 +23,6 @@ router.patch('/:email/:otp', authController.resetPassword);
 router.get('/:email', authController.sendOtp);
 router.patch('/password', authMiddleware.authVerifyMiddleware , authController.passwordChange);
 
+router.post("/social-login", authController.socialLogin)
+
 module.exports = router;
