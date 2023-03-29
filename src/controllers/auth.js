@@ -252,6 +252,9 @@ exports.resetPassword = async (req, res, next) => {
         session.endSession();
         console.log(e)
         next(e)
+    }
+}
+
 exports.resetPassword = async (req, res) => {
 
     let email = req.params.email;
