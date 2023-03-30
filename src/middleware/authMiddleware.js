@@ -24,7 +24,6 @@ const authVerifyMiddleware = async (req, res, next)=>{
     }
 }
 
-
 function checkPermissions(permission) {
     return async function (req, res, next) {
         const userId = req.auth._id;
@@ -34,7 +33,6 @@ function checkPermissions(permission) {
         if (user?.roleId.name === 'superadmin'){
             return next();
         }
-
         const roles = await Role.findById(user?.roleId._id).populate('permissions');
 
         const authorized = roles.permissions.some(item => item.name === permission);
