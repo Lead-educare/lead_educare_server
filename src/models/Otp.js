@@ -11,6 +11,9 @@ const otpSchema = new Schema({
         type: Number,
         default:0
     },
+    expire: {
+        type: Date
+    }
 }, {timestamps: true, versionKey: false});
 
 const Otp = model('Otp', otpSchema);

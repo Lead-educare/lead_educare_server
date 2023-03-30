@@ -2,10 +2,7 @@ const userService = require("./userService");
 const error = require('../helpers/error');
 const otpService = require("./otpService");
 const sendOTP = require('../helpers/sendOTP');
-const FormHelper = require('../helpers/FormHelper');
 const authHelper = require('../helpers/authHelper');
-const Role = require('../models/Role');
-const Permission = require('../models/Permission');
 const rolePermissionService = require('../services/admin/rolePermissionService');
 
 const registerService = async (
@@ -31,7 +28,7 @@ const registerService = async (
         if (!isRole){
             isRole = await rolePermissionService.createNewRoleService({roleName: role});
         }
-        return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword, roles: isRole?._id});
+        return await userService.createNewUser({email, mobile, firstName, lastName, password, confirmPassword, roleId: isRole?._id});
     } else {
         throw error('Server error occurred', 5000)
     }
@@ -56,7 +53,7 @@ const loginService = async (
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
+        roleId: user.roleId,
         mobile: user.mobile,
         status: user.status,
         verified: user.verified
