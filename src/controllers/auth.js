@@ -5,8 +5,6 @@ const FormHelper = require('../helpers/FormHelper');
 exports.register = async (req, res, next) => {
     try {
         const {email, mobile, firstName, lastName, password, confirmPassword} = req.body;
-
-
         if (FormHelper.isEmpty(email)){
             return res.status(400).json({
                 error: 'Email is required'
@@ -105,33 +103,6 @@ exports.verifyOTP = async (req, res, next) => {
     await session.startTransaction();
 
     try {
-        // Without transaction
-       /* let OTPCount = await OtpModel.aggregate([
-            {$match: {email: email, otp: OTPCode, status: status}}, {$count: "total"}
-        ])
-
-        if (OTPCount.length > 0) {
-
-            let OTPUpdate = await OtpModel.updateOne({email, otp: OTPCode, status: status}, {
-                email: email,
-                otp: OTPCode,
-                status: statusUpdate
-            })
-
-
-            await UserModel.updateOne({email}, {verified: true});
-
-        } else {
-            res.status(400).json({
-                status: "fail",
-                error: "Invalid OTP Code"
-            })
-        }
-        res.status(200).json({
-            message: "OTP verify successfully",
-        })*/
-
-        // With Transaction
         const options = { session };
         await authService.verifyOtpService(email, otp, options);
 
@@ -253,5 +224,30 @@ exports.resetPassword = async (req, res, next) => {
         next(e)
     }
 }
+
+
+
+exports.createRole = async ()=>{
+
+}
+exports.createPermission = async (req, res, next)=>{
+    const {permission, roleId} = req.body;
+    const session = await mongoose.startSession();
+    await session.startTransaction();
+    try {
+        const options = { session };
+        const result = await authService.createNewPermissionService({permissionName: permission, roleId, options});
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json(result);
+    }catch (e) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Transaction aborted:', e);
+        next(e)
+    }
+
+}
+
 
 

@@ -34,6 +34,7 @@ function checkPermissions(permission) {
         if (user?.roleId.name === 'superadmin'){
             return next();
         }
+
         const roles = await Role.findById(user?.roleId._id).populate('permissions');
 
         const authorized = roles.permissions.some(item => item.name === permission);
