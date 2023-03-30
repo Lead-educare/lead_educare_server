@@ -13,7 +13,6 @@ router.get('/permission-check', authMiddleware.authVerifyMiddleware, authMiddlew
     res.status(200).json({ok: true});
 });
 
-
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.get('/:email/:otp', authController.verifyOTP);
