@@ -15,9 +15,9 @@ const updateOtp = ({email, otp, status, options = null})=>{
     return OtpModel.updateOne({email}, {$set: {otp, status: status}}, {new: true});
 }
 
-const createOtp = (email)=>{
-
-    return OtpModel.create({email, otp})
+const createOtp = ({email, otp})=>{
+    const newOtp = new OtpModel({email, otp});
+    return newOtp.save();
 }
 
 module.exports = {

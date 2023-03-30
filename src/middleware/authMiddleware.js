@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Role = require('../models/Role');
 const authVerifyMiddleware = async (req, res, next)=>{
     try {
         let token = req.headers.authorization;
@@ -23,35 +24,31 @@ const authVerifyMiddleware = async (req, res, next)=>{
     }
 }
 
-function checkPermissions(...permissions) {
+
+function checkPermissions(permission) {
     return async function (req, res, next) {
         const userId = req.auth._id;
-        const user = await User.findById(userId).populate('roles');
-        if (user?.roles[0]['name'] === 'SUPERADMIN'){
+
+        const user = await User.findById(userId).populate('roleId');
+
+        if (user?.roleId.name === 'superadmin'){
             return next();
         }
-        const userPermissions = user?.roles.reduce((permissions, role) => {
-            return permissions.concat(role.permissions);
-        }, []);
+        const roles = await Role.findById(user?.roleId._id).populate('permissions');
 
-        console.log(userPermissions)
+        const authorized = roles.permissions.some(item => item.name === permission);
 
-        const authorized = permissions.every((permission) =>
-            userPermissions.some(
-                (userPermission) => userPermission.name === permission
-            )
-        );
         if (!authorized) {
             return res.status(403).json({ message: 'Forbidden' });
         }
-        // next();
+        next();
     };
 }
 
 const isSuperAdmin = async (req, res, next)=>{
     try {
         const user = await User.findById(req.auth._id).populate('roles');
-        if (user?.roles[0]['name'] !== 'SUPERADMIN'){
+        if (user?.role.name !== 'superadmin'){
             return res.status(403).json({ message: 'Forbidden' });
         }
         next();

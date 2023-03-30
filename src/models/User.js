@@ -67,18 +67,18 @@ const userSchema = new Schema({
 
 
 
-    role: {
+   /* role: {
       type: String,
       enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
       default: 'USER'
-    },
+    },*/
 
     // role: {
     //   type: String,
     //   enum: ['SUPERADMIN','ADMIN','TEACHER','USER'],
     //   default: 'USER'
     // },
-    roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+    roleId: { type: Schema.Types.ObjectId, ref: 'Role' },
     status: {
         type: String,
         enum: ['active', 'inactive', 'blocked'],

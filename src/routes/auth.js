@@ -9,7 +9,7 @@ router.get('/superadmin-check', authMiddleware.authVerifyMiddleware, authMiddlew
     res.status(200).json({ok: true});
 });
 
-router.get('/permission-check', authMiddleware.authVerifyMiddleware, authMiddleware.checkPermissions('create_user'), (req, res)=>{
+router.get('/permission-check', authMiddleware.authVerifyMiddleware, authMiddleware.checkPermissions('can_delete_user'), (req, res)=>{
     res.status(200).json({ok: true});
 });
 
@@ -21,6 +21,4 @@ router.patch('/:email/:otp', authController.resetPassword);
 router.get('/:email', authController.sendOtp);
 router.patch('/password', authMiddleware.authVerifyMiddleware , authController.passwordChange);
 
-// Role Permission Route
-router.post('/permissions', authMiddleware.authVerifyMiddleware, authMiddleware.isSuperAdmin, authController.createPermission);
 module.exports = router;
