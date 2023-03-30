@@ -16,9 +16,9 @@ const findUserByProperty = (key, value, projection = null) => {
 };
 
 const createNewUser = (
-    {email, mobile, firstName, lastName, password, confirmPassword, roles}
+    {email, mobile, firstName, lastName, password, confirmPassword, roleId}
 )=>{
-    const user = new User({email, mobile, firstName, lastName, password, confirmPassword, roles});
+    const user = new User({email, mobile, firstName, lastName, password, confirmPassword, roleId});
     return user.save();
 }
 
