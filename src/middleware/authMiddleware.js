@@ -12,7 +12,7 @@ const authVerifyMiddleware = async (req, res, next)=>{
         token = token.split(' ')[1];
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
 
-        const user = await userService.findUserByProperty('_id', decoded._id)
+        const user = await User.findById(decoded._id);
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -56,7 +56,23 @@ const isSuperAdmin = async (req, res, next)=>{
     }
 }
 
+const isAdmin = async (req, res, next)=>{
+    try {
+        const user = await User.findById(req.auth._id).populate({
+            path: 'roleId',
+            match: { $or: [{ name: {$nin: ['user', 'teacher']} } ] }
+        });
+
+        if (user?.roleId === null){
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+        next();
+    }catch (e) {
+        next(e)
+    }
+}
+
 
 module.exports = {
-    authVerifyMiddleware, checkPermissions, isSuperAdmin
+    authVerifyMiddleware, checkPermissions, isSuperAdmin, isAdmin
 }
