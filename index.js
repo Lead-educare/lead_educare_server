@@ -7,7 +7,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 const routes = require('./src/routes');
+
 
 
 app.use(helmet());
@@ -16,6 +18,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.static('public'));
 app.use(cors());
 app.use(xss());
+app.use(morgan('dev'));
 
 
 const limiter = rateLimit({

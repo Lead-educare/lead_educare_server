@@ -12,6 +12,9 @@ router.get('/superadmin-check', authMiddleware.authVerifyMiddleware, authMiddlew
 router.get('/permission-check', authMiddleware.authVerifyMiddleware, authMiddleware.checkPermissions('can_delete_user'), (req, res)=>{
     res.status(200).json({ok: true});
 });
+router.get('/admin-check', authMiddleware.authVerifyMiddleware, authMiddleware.isAdmin, (req, res)=>{
+    res.status(200).json({ok: true});
+});
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
