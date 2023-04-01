@@ -2,17 +2,25 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-const findUserByProperty = (key, value, projection = null) => {
-    if (key === '_id') {
-        if (projection !== null){
-            return User.findById(value, projection);
-        }
-        return User.findById(value);
-    }
+const findUserByProperty = async (key, value, projection = null) => {
     if (projection !== null){
-        return User.findOne({ [key]: value }, projection);
+        const user = await User.aggregate([
+            {$match: {[key]: value}},
+            {$lookup: {from: 'roles', localField: 'roleId', foreignField: '_id', as: 'role'}},
+            {$unwind: '$role'},
+            {$lookup: {from: 'permissions', localField: 'role.permissions', foreignField: '_id', as: 'permissions'}},
+            {$project: projection}
+        ]);
+        return user[0]
     }
-    return User.findOne({ [key]: value });
+
+    const user = await User.aggregate([
+        {$match: {[key]: value}},
+        {$lookup: {from: 'roles', localField: 'roleId', foreignField: '_id', as: 'role'}},
+        {$unwind: '$role'},
+        {$lookup: {from: 'permissions', localField: 'role.permissions', foreignField: '_id', as: 'permissions'}},
+    ]);
+    return user[0]
 };
 
 const createNewUser = (
@@ -42,7 +50,15 @@ const userProfileUpdateService = async (_id, firstName, lastName)=>{
             lastName,
         }}, {runValidators: true});
 }
+const userUpdateService = async (query, updateObj, options = null)=>{
+
+    if(options !== null){
+        return User.updateOne(query, updateObj, {runValidators: true, ...options});
+    }
+
+    return User.updateOne(query, updateObj, {runValidators: true});
+}
 
 module.exports = {
-    findUserByProperty, createNewUser, passwordUpdateService, userProfileUpdateService
+    findUserByProperty, createNewUser, passwordUpdateService, userProfileUpdateService, userUpdateService
 }
