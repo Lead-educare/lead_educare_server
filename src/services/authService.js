@@ -68,21 +68,7 @@ const loginService = async ({ email, password }) => {
       400
     );
 
-  const payload = {
-    _id: user._id,
-    email: user.email,
-    mobile: user.mobile,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    status: user.status,
-    verified: user.verified,
-    role: {
-      _id: user.role._id,
-      name: user.role.name,
-    },
-    permissions: user.permissions,
-  };
-  return authHelper.createToken(payload);
+  return authHelper.createToken(user);
 };
 
 const socialLoginService = async (userData) => {
@@ -109,42 +95,11 @@ const socialLoginService = async (userData) => {
       roleId: isRole?._id,
     });
 
-    let user = await userService.findUserByProperty("email", email);
+    const user = await userService.findUserByProperty("email", email);
 
-    const payload = {
-      _id: user._id,
-      email: user.email,
-      mobile: user.mobile,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      status: user.status,
-      verified: user.verified,
-      role: {
-        _id: user.role._id,
-        name: user.role.name,
-      },
-      permissions: user.permissions,
-    };
-
-    return authHelper.createToken(payload);
+    return authHelper.createToken(user);
   }
-
-  const payload = {
-    _id: user._id,
-    email: user.email,
-    mobile: user.mobile,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    status: user.status,
-    verified: user.verified,
-    role: {
-      _id: user.role._id,
-      name: user.role.name,
-    },
-    permissions: user.permissions,
-  };
-
-  return authHelper.createToken(payload);
+  return authHelper.createToken(user);
 };
 
 const sendOtpService = async (email) => {
