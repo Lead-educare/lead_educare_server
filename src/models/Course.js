@@ -35,9 +35,6 @@ const courseSchema = new Schema({
         type: ObjectId,
         ref: 'Category'
     },
-    gems: {
-        type: Number
-    },
     benefit: [String],
     thumbnail: {
         type: String
