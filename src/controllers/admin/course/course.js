@@ -1,7 +1,6 @@
 const createCourse = async (req, res, next)=>{
-
     try {
-
+        const {name, description, regularPrice, sellPrice, teacherId, categoryId, benefit, thumbnail} = req.body;
     }catch (e) {
         next(e)
     }

@@ -9,6 +9,7 @@ const FormHelper = require('../../../helpers/FormHelper');
 const checkAssociateService = require("../../common/checkAssociateService");
 const CourseModel = require('../../../models/Course');
 const deleteService = require("../../common/deleteServide");
+const slugify = require("slugify");
 
 const createCategory = async ({name})=>{
         const isCategory = await findOneByProperty('name', name, CourseCategoryModel);
@@ -26,7 +27,8 @@ const updateCategory = async (catId, name)=>{
     if (!FormHelper.isIdValid(catId)) throw error('id is not valid', 400);
     const isCategory = await CourseCategoryModel.findOne({name: name.toLowerCase(), _id: {$ne: new ObjectId(catId)} });
     if (isCategory) throw error('category already exits', 400);
-    return updateService({'_id': new ObjectId(catId)}, {name}, CourseCategoryModel);
+    const slug = slugify(name);
+    return updateService({'_id': new ObjectId(catId)}, {name, slug}, CourseCategoryModel);
 }
 
 const deleteCategory = async (catId)=>{
