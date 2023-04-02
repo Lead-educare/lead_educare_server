@@ -1,7 +1,7 @@
 const {Schema, model} = require('mongoose');
 const slugify = require("slugify");
 
-const categorySchema = new Schema({
+const courseCategorySchema = new Schema({
     name: {
         type: String,
         unique: true,
@@ -17,11 +17,11 @@ const categorySchema = new Schema({
 
 }, {versionKey: false, timestamps: true});
 
-categorySchema.pre('save', function (next) {
+courseCategorySchema.pre('save', function (next) {
     this.slug = slugify(this.name);
     next();
 })
 
-const Category = model('Category', categorySchema);
+const CourseCategory = model('CourseCategory', courseCategorySchema);
 
-module.exports = Category;
+module.exports = CourseCategory;

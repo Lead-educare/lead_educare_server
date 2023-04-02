@@ -1,8 +1,9 @@
 const validator = require('validator');
-
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 class FormHelper {
     isEmpty = (value) => {
-        return value.trim() === ''
+        return value === ''
     }
     isEmail = (email) => {
         return validator.isEmail(email);
@@ -25,6 +26,9 @@ class FormHelper {
         return password === confirmPassword
     }
 
+    isIdValid = (id)=>{
+        return ObjectId.isValid(id);
+    }
 }
 
 module.exports = new FormHelper();
